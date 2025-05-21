@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./miniBank-backend
+    container_name: minibank-backend
+    ports:
+      - '5000:5000'
+    environment:
+      - MONGO_URI=your_mongo_url
+      - JWT_SECRET=your_super_secret_key
+    volumes:
+      - ./miniBank-backend:/app
+    restart: always
+
+  frontend:
+    build: ./miniBank-frontend
+    container_name: minibank-frontend
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+    restart: always
