@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authLogin } from '../api';
 import { toast } from 'sonner';
 
@@ -55,7 +55,12 @@ export default function Login() {
           className="w-full p-3 border border-gray-300 rounded mb-6"
           required
         />
-
+        <p className="text-sm mb-2">
+          Not register ? {'  '}
+          <Link to={'/register'} className="border-b text-blue-800">
+            Registered Now
+          </Link>
+        </p>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition disabled:bg-blue-500/50"

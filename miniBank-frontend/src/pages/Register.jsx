@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authRegistration } from '../api';
 import { toast } from 'sonner';
 
@@ -60,6 +60,12 @@ export default function Register() {
           required
         />
 
+        <p className="text-sm mb-2">
+          Already registered ? {'  '}
+          <Link to={'/login'} className="border-b text-blue-800">
+            Login
+          </Link>
+        </p>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition disabled:bg-blue-600/50"
