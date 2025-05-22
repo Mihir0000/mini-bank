@@ -7,9 +7,21 @@ class UserServices {
     try {
       const { name, email, password } = req.body;
 
+      if (!name || !email || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+
       const existing = await userModal.findOne({ email });
       if (existing)
         return res.status(400).json({ message: 'Email already registered' });
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          message:
+            'Password must be at least 8 characters long, include 1 uppercase letter, 1 lowercase letter, and 1 special character.',
+        });
+      }
 
       const hashed = await bcrypt.hash(password, 10);
       const user = new userModal({ name, email, password: hashed });
@@ -25,6 +37,9 @@ class UserServices {
     try {
       const { email, password } = req.body;
 
+      if (!email || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
       const user = await userModal.findOne({ email });
       if (!user)
         return res.status(400).json({ message: 'Invalid credentials' });

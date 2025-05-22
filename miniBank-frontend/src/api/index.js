@@ -39,3 +39,6 @@ export const getWalletBalance = () => request('/wallet');
 export const fetchTransactions = () => request('/transactions');
 export const fetchSummaryByDate = (date) =>
   request(`/transactions/summary/${date}`);
+
+export const getDailyExpenses = async () =>
+  request('/transactions/expenses-daily');

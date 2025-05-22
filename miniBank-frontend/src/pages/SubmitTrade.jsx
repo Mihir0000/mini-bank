@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const SubmitTrade = () => {
   const [form, setForm] = useState({
@@ -37,7 +38,7 @@ const SubmitTrade = () => {
       setStatus('success');
       setForm({ instrument: '', price: '', volume: '' });
     } catch (err) {
-      console.error(err);
+      toast.error(err?.message);
       setStatus('error');
     }
   };
@@ -76,7 +77,7 @@ const SubmitTrade = () => {
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 rounded"
+          className="bg-green-500 hover:bg-green-600 text-white py-2 rounded cursor-pointer"
         >
           {status === 'submitting' ? 'Submitting...' : 'Submit Trade'}
         </button>

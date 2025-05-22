@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
 const TransferForm = () => {
   const [email, setEmail] = useState('');
   const [amount, setAmount] = useState('');
-  const [message, setMessage] = useState('');
+  // const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTransfer = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     const idempotencyKey = uuidv4();
-
+    setIsLoading(true);
     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/transfer`, {
       method: 'POST',
       headers: {
@@ -25,7 +27,13 @@ const TransferForm = () => {
     });
 
     const data = await res.json();
-    setMessage(data.message);
+    // setMessage(data.message);
+    if (res.ok) {
+      toast.success(data.message);
+    } else {
+      toast.error(data.message);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -50,12 +58,13 @@ const TransferForm = () => {
         />
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded cursor-pointer disabled:bg-blue-500/50"
+          disabled={isLoading}
         >
           Send
         </button>
       </form>
-      {message && <p className="mt-4 text-center font-medium">{message}</p>}
+      {/* {message && <p className="mt-4 text-center font-medium">{message}</p>} */}
     </div>
   );
 };

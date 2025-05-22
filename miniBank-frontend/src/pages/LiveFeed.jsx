@@ -48,7 +48,7 @@ const LiveFeed = () => {
         <span>Instrument</span>
         <span>Price</span>
         <span>Volume</span>
-        <span>Date</span>
+        <span>Time</span>
       </div>
 
       <ul className="max-h-96 overflow-auto divide-y">

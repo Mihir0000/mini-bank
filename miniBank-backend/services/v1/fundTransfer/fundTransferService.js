@@ -13,7 +13,11 @@ class FundTransferService {
 
     const existing = await transferKey.findOne({ key: idempotencyKey });
     if (existing) return res.json(existing.response);
-
+    if (typeof amount !== 'number' || amount <= 0) {
+      return res
+        .status(400)
+        .json({ message: 'Amount must be a positive number' });
+    }
     const session = await mongoose.startSession();
     session.startTransaction();
 

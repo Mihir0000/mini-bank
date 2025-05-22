@@ -8,24 +8,24 @@ const rateLimiter = async (req, res, next) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const now = Date.now();
-    const windowSize = 60 * 1000; // 1 minute
+    const now = new Date();
+    const windowSize = 60 * 1000;
     const maxRequests = 100;
+    const windowStart = new Date(now.getTime() - windowSize);
 
-    let userLimit = await rateLimitSchema.findOne({ userId });
-
-    if (!userLimit) {
-      userLimit = new rateLimitSchema({ userId, timestamps: [] });
-    }
-
-    // Filter timestamps within the sliding window
-    userLimit.timestamps = userLimit.timestamps.filter(
-      (ts) => now - new Date(ts).getTime() < windowSize
+    const userLimit = await rateLimitSchema.findOneAndUpdate(
+      { userId },
+      {
+        $pull: { timestamps: { $lt: windowStart } },
+      },
+      { new: true, upsert: true }
     );
 
-    if (userLimit.timestamps.length >= maxRequests) {
+    const requestCount = userLimit?.timestamps?.length ?? 0;
+
+    if (requestCount >= maxRequests) {
       const retryAfter = Math.ceil(
-        (new Date(userLimit.timestamps[0]).getTime() + windowSize - now) / 1000
+        (userLimit.timestamps[0].getTime() + windowSize - now.getTime()) / 1000
       );
       res.set('Retry-After', retryAfter);
       return res
@@ -33,8 +33,14 @@ const rateLimiter = async (req, res, next) => {
         .json({ message: 'Too many requests. Try again later.' });
     }
 
-    userLimit.timestamps.push(new Date());
-    await userLimit.save();
+    await rateLimitSchema.findOneAndUpdate(
+      { userId },
+      {
+        $push: { timestamps: now },
+        $setOnInsert: { userId },
+      },
+      { upsert: true }
+    );
 
     next();
   } catch (error) {

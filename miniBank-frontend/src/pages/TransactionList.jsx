@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchTransactions } from '../api';
+import { toast } from 'sonner';
 
 const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
@@ -7,7 +8,7 @@ const TransactionList = () => {
   useEffect(() => {
     fetchTransactions()
       .then((data) => setTransactions(data))
-      .catch((err) => alert(err));
+      .catch((err) => toast.error(err?.message));
   }, []);
 
   return (

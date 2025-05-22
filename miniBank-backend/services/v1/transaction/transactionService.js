@@ -1,5 +1,6 @@
 const dailySummaryModal = require('../../../models/transaction/dailySummaryModal');
 const transactionModal = require('../../../models/transaction/transactionModal');
+const mongoose = require('mongoose');
 
 class TransactionService {
   async getTopTransaction(req, res, next) {
@@ -22,17 +23,56 @@ class TransactionService {
   async getSummary(req, res, next) {
     try {
       const { date } = req.params;
+      if (!date) {
+        return res.status(400).json({ message: 'Date is required' });
+      }
 
       const summary = await dailySummaryModal.findOne({ date });
 
-      // if (!summary)
-      //   return res
-      //     .status(404)
-      //     .json({ error: 'Summary not found for this date' });
-
-      return res.json(summary);
+      return res.json(summary || []);
     } catch (err) {
       return res.status(500).json({ error: 'Error ' + err?.message });
+    }
+  }
+
+  async getDailyExpenses(req, res) {
+    try {
+      const userId = req.userId;
+
+      const lastThirtyDays = new Date();
+      lastThirtyDays.setDate(lastThirtyDays.getDate() - 30);
+      const expenses = await transactionModal.aggregate([
+        {
+          $match: {
+            from: new mongoose.Types.ObjectId(userId),
+            createdAt: { $gte: lastThirtyDays },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+            },
+            amount: { $sum: '$amount' },
+          },
+        },
+        {
+          $sort: {
+            _id: 1,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: '$_id',
+            amount: 1,
+          },
+        },
+      ]);
+
+      return res.json(expenses);
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to fetch expenses' });
     }
   }
 }

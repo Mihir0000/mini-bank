@@ -59,12 +59,14 @@ MONGO_URI=mongodb://localhost:27017/minibank
 
 ## 🐳 Run with Docker
 
-- Step 1: Build and Start - `docker-compose up --build`
-- Step 2: Access Application
+- Step 1: Setup environment in **`docker-compose.yml`**
+- Step 2: Build and Start - **`docker-compose up --build`**
+- Step 3: Access Application
+
   - Frontend: http://localhost:3000
   - Backend: http://localhost:5000
 
-MongoDB: Containerized DB at mongo:27017
+- #### ⚠️ MongoDb: If you're using Containerized DB then please setup **Replica Set**
 
 ## 🐙 Docker File Structure
 
@@ -144,19 +146,16 @@ Connect to: VITE_API_SOCKET_BASE_URL
 event: tradeBatch – Receive real-time trades
 ```
 
+#### [`Api Docs : http://localhost:5000/api-docs`](http://localhost:5000/api-docs)
+
 ## 🛡️ Rate Limiting
 
 ```text
 Limit: 100 requests/minute per user
-
 Middleware: Sliding window algorithm
-
 Storage: MongoDB TTL index on timestamps
-
 Response on exceed:
-
 HTTP 429 Too Many Requests
-
 Header: Retry-After: <seconds>
 ```
 

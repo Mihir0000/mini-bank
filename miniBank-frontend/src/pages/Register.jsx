@@ -1,21 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authRegistration } from '../api';
+import { toast } from 'sonner';
 
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const navigate = useNavigate();
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await authRegistration(form);
       navigate('/login');
     } catch (err) {
-      alert(err.message);
+      toast.error(err?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,7 +62,8 @@ export default function Register() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition disabled:bg-blue-600/50"
+          disabled={isLoading}
         >
           Sign Up
         </button>

@@ -2,24 +2,30 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { authLogin } from '../api';
+import { toast } from 'sonner';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+
   const [form, setForm] = useState({ email: '', password: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     try {
       const data = await authLogin(form);
       login(data.token);
+      toast.success('Login Successfully');
       navigate('/dashboard');
     } catch (err) {
-      alert(err);
+      toast.error(err?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,7 +58,8 @@ export default function Login() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition disabled:bg-blue-500/50"
+          disabled={isLoading}
         >
           Login
         </button>
